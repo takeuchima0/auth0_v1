@@ -8,8 +8,8 @@ import { apiUrl } from "../../config/env";
 const inter = Inter({ subsets: ["latin"] });
 
 /**
- * カスタムフック: Auth0からアクセストークンを取得します。
- * @returns {string} アクセストークンを返します。
+ * カスタムフック: Auth0からアクセストークンを取得
+ * @returns {string} アクセストークンを返却
  */
 const useAuth0Token = (): string => {
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
@@ -27,7 +27,7 @@ const useAuth0Token = (): string => {
   return accessToken;
 };
 
-// カスタムフック: ユーザ情報を取得します。
+// カスタムフック: ユーザ情報を取得
 const useFetchMe = (token: any) => {
   const [me, setMe] = useState(null);
   const [error, setError] = useState<Error | null>(null);
@@ -59,7 +59,7 @@ const useFetchMe = (token: any) => {
 
 /**
  * ホームコンポーネント
- * @returns {JSX.Element} ホームコンポーネントを返します。
+ * @returns {JSX.Element} ホームコンポーネントを返却。
  */
 export default function Home(): JSX.Element {
   const { isAuthenticated } = useAuth0();
