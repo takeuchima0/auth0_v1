@@ -3,40 +3,38 @@ import SignoutButton from "@/components/auth/SignoutButton";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Inter } from "next/font/google";
 import { useCallback, useEffect, useState } from "react";
+import { apiUrl } from "../../config/env";
 
 const inter = Inter({ subsets: ["latin"] });
-const API_URL = "http://localhost:8000";
 
-// カスタムフック: Auth0トークンを取得
-const useAuth0Token = () => {
+/**
+ * カスタムフック: Auth0からアクセストークンを取得します。
+ * @returns {string} アクセストークンを返します。
+ */
+const useAuth0Token = (): string => {
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
   const [accessToken, setAccessToken] = useState("");
 
   const fetchToken = useCallback(async () => {
-    console.log("[0001] from fetchToken user:", user?.sub);
     const token = await getAccessTokenSilently();
-    console.log("[0002] from fetchToken token:", token.toString());
     setAccessToken(token)
-  }, [getAccessTokenSilently, user?.sub]);
+  }, [getAccessTokenSilently]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchToken();
-    }
+    if (isAuthenticated) fetchToken();
   }, [isAuthenticated, user?.sub, fetchToken]);
 
   return accessToken;
 };
 
-// カスタムフック: ユーザ情報の取得
+// カスタムフック: ユーザ情報を取得します。
 const useFetchMe = (token: any) => {
   const [me, setMe] = useState(null);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchMe = useCallback(async () => {
-    console.log("[検証中1] from fetchMe token:", token.toString());
     try {
-      const res = await fetch(`${API_URL}/v1/users/me`, {
+      const res = await fetch(`${apiUrl}/v1/users/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,7 +50,6 @@ const useFetchMe = (token: any) => {
       setError(null);
 
     } catch (e: any) {
-      console.error(e);
       setError(e);
     }
   }, [token]);
@@ -60,8 +57,11 @@ const useFetchMe = (token: any) => {
   return { me, error, fetchMe };
 };
 
-// Homeコンポーネント
-export default function Home() {
+/**
+ * ホームコンポーネント
+ * @returns {JSX.Element} ホームコンポーネントを返します。
+ */
+export default function Home(): JSX.Element {
   const { isAuthenticated } = useAuth0();
   const token = useAuth0Token();
   const { me, error, fetchMe } = useFetchMe(token);
