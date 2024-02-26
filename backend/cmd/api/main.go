@@ -4,10 +4,18 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/auth0_v1/config"
 	"github.com/joho/godotenv"
 )
 
-var origin string = "http://localhost:3000"
+var origin string
+
+func init() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("Error loading the .env file: %v", err)
+	}
+	origin = config.GetEnv("ORIGIN_URL", "http://localhost:3000")
+}
 
 func CORSMiddleware(handler http.Handler, origin string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,10 +34,6 @@ func CORSMiddleware(handler http.Handler, origin string) http.Handler {
 }
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading the .env file: %v", err)
-	}
-
 	router := http.NewServeMux()
 
 	router.Handle("/api/public", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
