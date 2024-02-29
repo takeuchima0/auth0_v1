@@ -39,7 +39,7 @@ func main() {
 	router.Handle("/api/public", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(`{"message":"Hello from a public endpoint! You don't need to be authenticated to see this."}`)); err != nil {
+		if _, err := w.Write([]byte(`{"message":"public api success"}`)); err != nil {
 			log.Printf("Error writing the response: %v", err)
 		}
 	}))
@@ -48,7 +48,7 @@ func main() {
 	router.Handle("/api/v1/users/me", middleware.EnsureValidToken()(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			if _, err := w.Write([]byte(`{"message":"Hello from a private endpoint! You need to be authenticated to see this."}`)); err != nil {
+			if _, err := w.Write([]byte(`{"message":"private api success"}`)); err != nil {
 				log.Printf("Error writing the response: %v", err)
 			}
 		}),
