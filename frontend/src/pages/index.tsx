@@ -31,11 +31,11 @@ const useAuth0Token = (): string => {
 const useFetchMe = (token: any) => {
   const [me, setMe] = useState(null);
   const [error, setError] = useState<Error | null>(null);
-
   const fetchMe = useCallback(async () => {
     try {
-      const res = await fetch(`${apiUrl}/v1/users/me`, {
+      const res = await fetch(`${apiUrl}/api/v1/users/me`, {
         method: "GET",
+        mode: "cors",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -1,3 +1,5 @@
+// main.go
+
 package main
 
 import (
@@ -5,21 +7,14 @@ import (
 	"net/http"
 
 	"github.com/auth0_v1/config"
+	"github.com/auth0_v1/middleware"
 	"github.com/joho/godotenv"
 )
 
-var origin string
-
-func init() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading the .env file: %v", err)
-	}
-	origin = config.GetEnv("ORIGIN_URL", "http://localhost:3000")
-}
-
-func CORSMiddleware(handler http.Handler, origin string) http.Handler {
+func CORSMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", config.EnvConfig.Origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
@@ -34,26 +29,33 @@ func CORSMiddleware(handler http.Handler, origin string) http.Handler {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading the .env file: %v", err)
+	}
+
 	router := http.NewServeMux()
 
+	// This route is always accessible.
 	router.Handle("/api/public", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(`{"message":"public api ok"}`)); err != nil {
-			log.Printf("Error writing response: %v", err)
+		if _, err := w.Write([]byte(`{"message":"Hello from a public endpoint! You don't need to be authenticated to see this."}`)); err != nil {
+			log.Printf("Error writing the response: %v", err)
 		}
 	}))
 
-	router.Handle("/v1/users/me", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(`{"message":"get me api ok"}`)); err != nil {
-			log.Printf("Error writing response: %v", err)
-		}
-	}))
+	// This route is only accessible if the user has a valid access_token.
+	router.Handle("/api/v1/users/me", middleware.EnsureValidToken()(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			if _, err := w.Write([]byte(`{"message":"Hello from a private endpoint! You need to be authenticated to see this."}`)); err != nil {
+				log.Printf("Error writing the response: %v", err)
+			}
+		}),
+	))
 
 	log.Print("Server listening on http://localhost:8080")
-	if err := http.ListenAndServe("0.0.0.0:8080", CORSMiddleware(router, origin)); err != nil {
+	if err := http.ListenAndServe("0.0.0.0:8080", CORSMiddleware(router)); err != nil {
 		log.Fatalf("There was an error with the http server: %v", err)
 	}
 }
