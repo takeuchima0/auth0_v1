@@ -11,8 +11,8 @@ type envConfig struct {
 	Environment string `env:"ENVIRONMENT" envDefault:"development"`
 
 	// Server Configuration
-	Origin  string `env:"ORIGIN_URL" envDefault:"http://localhost:3000"`
-	Port    string `env:"PORT" envDefault:"8080"`
+	Origin  string `env:"ORIGIN_URL" envDefault:"http://localhost:3001"`
+	Port    string `env:"PORT" envDefault:"8081"`
 	RunMode string `env:"GIN_MODE" envDefault:"release"`
 
 	// Auth0 Configuration

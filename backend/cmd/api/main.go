@@ -54,8 +54,8 @@ func main() {
 		}),
 	))
 
-	log.Print("Server listening on http://localhost:8080")
-	if err := http.ListenAndServe("0.0.0.0:8080", CORSMiddleware(router)); err != nil {
+	log.Print("Server listening on http://localhost:8081")
+	if err := http.ListenAndServe("0.0.0.0:8081", CORSMiddleware(router)); err != nil {
 		log.Fatalf("There was an error with the http server: %v", err)
 	}
 }
