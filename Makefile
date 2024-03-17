@@ -15,3 +15,6 @@ front:
 
 api:
 	cd backend && air -c .air.toml
+
+api-lint:
+	cd backend && golangci-lint run
