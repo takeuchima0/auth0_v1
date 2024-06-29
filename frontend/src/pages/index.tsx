@@ -33,6 +33,7 @@ const useFetchMe = (token: any) => {
   const [error, setError] = useState<Error | null>(null);
   const fetchMe = useCallback(async () => {
     try {
+      console.log("token", token);
       const res = await fetch(`${apiUrl}/api/v1/users/me`, {
         method: "GET",
         mode: "cors",
